@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "title": "Registration Open for Nirman Hackathon 2025",
+    "date": "2024-12-20",
+    "content": "Early bird registration is now open for our flagship hackathon event. Limited seats available.",
+    "priority": "high",
+    "isNew": true
+  },
+  {
+    "id": "2",
+    "title": "Incubation Center Applications Now Open",
+    "date": "2024-12-15",
+    "content": "Apply for our 6-month incubation program with mentorship, funding support, and workspace facilities.",
+    "priority": "medium",
+    "isNew": true
+  },
+  {
+    "id": "3",
+    "title": "Guest Lecture by Successful Alumni",
+    "date": "2024-12-10",
+    "content": "Join us for an inspiring session with our alumni who have successfully launched their startups.",
+    "priority": "low",
+    "isNew": false
+  }
+]

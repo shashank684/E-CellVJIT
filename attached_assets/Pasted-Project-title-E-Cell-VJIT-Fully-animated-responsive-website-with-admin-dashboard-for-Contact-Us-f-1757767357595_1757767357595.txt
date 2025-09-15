@@ -1,0 +1,182 @@
+Project title: E-Cell VJIT — Fully animated responsive website with admin dashboard for Contact Us form responses
+High-level summary:
+Create a production-ready, highly animated, responsive website for E-Cell VJIT (main heading E-CELL VJIT and subheading Where Ideas Take Off). Use a black (#000000) background as the primary canvas and red (#d82032) as the single highlight color. The website must be pixel-perfect to the design spec below, extremely animated (next-level animations), fast, accessible, and include a password-protected admin page that displays the responses of the Contact Us form built into the website. Do not use emojis anywhere in the website UI copy.
+________________________________________
+Required technologies (exact)
+•	Frontend: React (Vite or Create React App is fine) + Tailwind CSS for styling.
+•	Animations: Framer Motion for UI motion + GSAP for advanced timeline control where needed.
+•	Background / 3D: Use Three.js or react-three-fiber only for the hero 3D wave/grid (keep it performant). Use a lightweight Canvas for particles (requestAnimationFrame).
+•	Backend: Node.js + Express (single server to host API endpoints).
+•	Database: MongoDB (via mongoose) or SQLite (lightweight local DB) to store contact form responses.
+•	Dev / build tools: npm/yarn, ESLint, Prettier config.
+•	Data fetching: Axios on the front end.
+•	Security: cookie-parser, helmet, cors for the server. jsonwebtoken for admin session.
+•	Optional (email): @sendgrid/mail if email notifications are required.
+________________________________________
+Project deliverables
+1.	Fully responsive frontend site (home + About + Team + Events + Announcements + Vision + Contact).
+2.	Backend API (endpoints described below) with DB integration for contact form.
+3.	Admin pages:
+o	/admin/login — password login.
+o	/admin/dashboard — protected view that lists Contact Us form responses with search, filter, pagination, and CSV download.
+4.	README with setup, deployment steps, and how to configure environment variables.
+5.	A .replit or start script so site runs on Replit without extra configuration.
+6.	All environment variables listed and referenced in README.
+7.	Unit test(s) for the API endpoint that reads stored responses (basic).
+________________________________________
+Visual & UI requirements (exact)
+Global styles & tokens
+•	CSS variables / Tailwind config:
+o	--bg: #000000 (black)
+o	--accent: #d82032 (red highlight)
+o	--muted: #a3a3a3 (secondary text)
+o	Font: Inter (import with preconnect & preload), fallback system-ui, -apple-system, "Segoe UI", Roboto.
+•	Typography scale (desktop):
+o	H1: 56px (tight leading), letter-spacing: -0.02em — E-CELL VJIT (ALL CAPS)
+o	H2: 36px
+o	Body: 16px
+•	Color & contrast: Ensure WCAG AA contrast for all text over black.
+General behavior
+•	No emojis in UI copy anywhere.
+•	Respect prefers-reduced-motion — provide reduced or disabled animations when user prefers it.
+•	Responsive breakpoints: mobile (≤640px), tablet (641–1024px), desktop (≥1025px).
+•	Assets: SVG first approach for icons and logo; images should be responsive and lazy-loaded.
+Page-by-page spec & animation details (exact)
+Header & Nav (top-right placement for logo)
+•	Fixed top navigation with transparent background initially.
+•	Top-right: small circular logo SVG + text E-Cell VJIT (logo left, text right). On load, they animate in (fade + slight slide).
+•	Nav links (left-to-right center/right): About | Team | Events | Announcements | Vision | Contact
+•	Nav animations:
+o	On hover: underline appears as a laser sweep (left→right) using a 250ms ease and glowing red underline of thickness 2px.
+o	On scroll (>80px): nav switches to semi-transparent glass (rgba(0,0,0,0.6)) with a subtle red border glow (box-shadow: 0 0 18px #d82032 / 25%).
+o	Mobile: hamburger toggles a full-screen overlay menu where links drop in with staggered 80ms interval.
+Hero / Home (centerstage)
+•	Full viewport height hero.
+•	Main heading (center): E-CELL VJIT — letter-by-letter neon flicker animation on first load (duration for letters total ≈1.2s; flicker effect subtle and not annoying).
+•	Subheading (below): Where Ideas Take Off — appears with a smooth slide + fade.
+•	CTAs: Join the Movement (primary — filled accent red with glow) and Explore Events (outlined, animated border). Buttons have a “magnetic/tilt” hover: they tilt slightly toward cursor (on desktop), pulse on hover (scale 1.03), and show ripple on click; duration 220ms.
+•	Background composition:
+o	A subtle 3D wave/grid (Three.js/react-three-fiber) moving slowly (amplitude small, fps-friendly). It should be dark grey with red highlights; use low poly/mesh to reduce CPU.
+o	Particles canvas (requestAnimationFrame) with small glowing red dots drifting slowly.
+o	Paper rocket: a lightweight SVG rocket that follows an invisible SVG path (dashed) across the hero. Path stroke uses dashed pattern 8 8 and glows when rocket passes. The rocket animation loop:
+	Duration of loop: ~12s,
+	Ping-pong motion (forward & back) or smooth loop along the path,
+	Rocket rotates to match path tangent,
+	Rocket leaves a faint trailing glow/fade for 1s behind it.
+•	Accessibility: If reduced motion, show a static rocket at one corner and disable heavy canvas & three.js motions.
+About
+•	Two-column split on desktop:
+o	Left: morphing abstract glowing polygon cluster (SVG/CSS morph) that animates slowly.
+o	Right: textual content: short description about E-Cell VJIT with typewriter effect for a 1-line highlight. Each paragraph fades in with 200ms stagger.
+•	On mobile: stacked with the visual above text.
+Team (very specific — the user asked for Instagram & LinkedIn per profile)
+•	Grid: 3 per row on desktop, 2 on tablet, 1 on mobile.(There are total Seven Team members )
+•	Card details:
+o	Circular profile image (240×240 recommended) — lazy loaded and srcset responsive.
+o	Name (white) and Role (muted grey).
+o	Two icons under role: Instagram and LinkedIn. Icons must:
+	Be white by default, on hover fill with brand color and a thin red outer glow. The click target opens the member’s profile in a new tab (target="_blank" rel="noopener noreferrer").
+	The icons should be keyboard accessible (tab focus) and have aria-label.
+o	Hover animation:
+	Profile image slightly scales up (scale 1.06), red ring glows (box-shadow) and card lifts with subtle 3D tilt (rotationX/Y up to 6 degrees).
+	Icons animate in with tiny upward motion when hovering the card.
+•	Data: Provide a JSON file src/data/team.json with structure:
+[
+  {
+    "name":"Shashank",
+    "role":" President",
+    "img":"/assets/team/shashank.jpg",
+    "instagram":"https://instagram.com/USERNAME",
+    "linkedin":"https://linkedin.com/in/USERNAME"
+  },
+  ...
+]
+•	Implementation note: if a social link is empty, do not render the icon.
+Events
+•	Horizontal carousel on desktop and swipeable on mobile or a vertical timeline if preferred. Each event card:
+o	Title, date (formatted), short description (max 120 chars), CTA (View details).
+o	Upcoming events glow more strongly; past events are dimmed.
+•	Load events from src/data/events.json. Cards animate in with fadeUp + slight scale.
+•	Optional event-details overlay/modal with 3D tilt.
+Announcements
+•	A thin red neon ticker across top of section (like a news ticker) with the latest announcement(s) scrolling left → right. Hovering the ticker pauses it.
+•	Below ticker, announcement cards appear in a grid with scale + fade on reveal. New announcements have a pulsing red border.
+Vision
+•	Full-width section with big heading “Our Vision” in red-glow typography. Paragraphs animate in word-by-word; a subtle scanning light passes across the section every ~4s.
+Contact / Reach Out
+•	Inputs: Name, Email, Message.
+•	On submit: POST to backend /api/form-submit.
+•	Backend stores responses in DB (MongoDB/SQLite).
+•	Below: static address, phone numbers, email, and social media links.
+
+Admin interface (exact, required)
+•	/admin/login — password login.
+•	/admin/dashboard — shows stored Contact Us form submissions.
+•	Features: search, filter by date, pagination, CSV export, refresh.
+•	Backend stores responses in DB, and /api/admin/responses fetches them.
+Backend API (exact endpoints)
+•	GET /api/site-data — serves JSON for team, events, announcements.
+•	POST /api/form-submit — saves contact form submission to DB.
+•	POST /api/admin/login — accepts { password } → JWT cookie.
+•	GET /api/admin/responses — returns saved form responses (protected).
+•	GET /api/admin/export-csv — CSV export of saved responses.
+•	GET /api/health — server health info.
+________________________________________
+Database integration
+•	Use MongoDB (Atlas or local) OR SQLite file for persistence.
+•	Schema: { timestamp, name, email, message }.
+•	Store each contact form submission here.
+•	Admin dashboard fetches from this DB.
+________________________________________
+Security & session details
+•	Use helmet() middleware.
+•	Use cors configured to allow only the frontend origin (or allow * for unrestricted dev).
+•	Admin login:
+o	POST /api/admin/login checks req.body.password === process.env.ADMIN_PASSWORD. On success generate JWT with jwt.sign({ role: 'admin' }, process.env.ADMIN_JWT_SECRET, { expiresIn: '2h' }).
+o	Set cookie: res.cookie('ecell_admin_token', token, { httpOnly: true, secure: true in prod, sameSite: 'lax', maxAge: 2h }).
+•	Protect /api/admin/* with middleware verifying the cookie.
+•	Do not leak the service account JSON to the client.
+________________________________________
+Dev & design system specifics (exact micro-interaction timings)
+•	Page transitions: 400ms easeOutCubic.
+•	Fade in staggered: 80ms between items.
+•	Hero letter flicker: each letter flicker randomly in 0.08–0.14s window during initial 1.2s animation.
+•	Rocket path duration: 12s loop; rocket rotates to match tangent; strokeDasharray 8 8.
+•	Particle movement: slow speed (max 0.2 px/frame).
+•	Button hover pulse: 220ms (scale 1 → 1.03).
+•	Card tilt on hover: transform 3D rotate (max 6deg) and translateZ 12px.
+•	Reduced motion: all these should have CSS/JS fallback to non-animated static alternatives.
+________________________________________
+Performance & accessibility (must be implemented)
+•	Lazy load images and defer noncritical JS (hero animation should not block LCP).
+•	Use prefers-reduced-motion media query to disable heavy animations.
+•	All interactive elements must be keyboard reachable (tab order) and have aria-labels.
+•	Add meta tags for SEO, OpenGraph image, Twitter Card.
+•	Lighthouse budget: aim for >90 accessibility and performance >=70 on mobile (not mandatory but strive for it).
+________________________________________
+Data & sample files (provide these)
+•	src/data/team.json (sample entries for 4 team members).
+•	src/data/events.json (sample entries for 3 events: Nirman Hackathon 2025, PitchQuest, Startup Workshop).
+•	src/data/announcements.json (sample announcements).
+Sample team.json entry (Replit should include these sample files):
+[
+  {
+    "name": "Shashank",
+    "role": "Vice President",
+    "img": "/assets/team/shashank.jpg",
+    "instagram": "https://instagram.com/USERNAME",
+    "linkedin": "https://linkedin.com/in/USERNAME"
+  }
+]
+
+Final notes for implementer
+•	Do not use emojis in any text on the site.
+•	Keep the UI clean, elegant, futuristic. Prioritize performance and accessibility.
+•	Make sure all external links to social profiles open in new tabs.
+•	Provide a deployable Replit project with secrets configured instructions and an easy way to change the Sheet ID and admin password.
+•	Provide sample team and event data and placeholder images; document where to replace with real images and links.
+Final acceptance criteria (the things you must deliver and verify)
+1.	Live site running on Replit domain with the animated hero and all sections implemented exactly as specified.
+2.	Clicking team profile icons opens the correct social page in a new tab.
+Admin login works (env ADMIN_PASSWORD) and /admin/dashboard shows the spreadsheet rows with pagination, search, and CSV download.
+No emojis anywhere in the site UI content.  
