@@ -4,8 +4,7 @@ import { Eye, Target, Globe, Zap } from 'lucide-react';
 
 export default function VisionSection() {
   const [scanLinePosition, setScanLinePosition] = useState(0);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  
+
   const visionText = 'To create a thriving ecosystem where innovative ideas transform into impactful solutions that shape the future of technology and entrepreneurship.';
   const words = visionText.split(' ');
 
@@ -17,15 +16,6 @@ export default function VisionSection() {
 
     return () => clearInterval(interval);
   }, []);
-
-  // Word-by-word animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentWordIndex((prev) => (prev + 1) % words.length);
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, [words.length]);
 
   const visionPoints = [
     {
@@ -44,6 +34,34 @@ export default function VisionSection() {
       description: 'Leading the way in emerging technologies and digital transformation across various industries.'
     }
   ];
+  
+  // Animation variants for the text container and individual words
+  const sentenceVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delay: 0.5,
+        staggerChildren: 0.08, // Time between each word animating in
+      },
+    },
+  };
+
+  const wordVariants = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        damping: 12,
+        stiffness: 100,
+      },
+    },
+  };
 
   return (
     <section className="py-16 md:py-24 px-4 relative overflow-hidden" data-testid="vision-section">
@@ -74,7 +92,7 @@ export default function VisionSection() {
           >
             <motion.div
               className="w-16 h-16 bg-gradient-to-br from-primary to-primary/50 rounded-full flex items-center justify-center"
-              animate={{ 
+              animate={{
                 boxShadow: [
                   '0 0 20px #d82032',
                   '0 0 40px #d82032',
@@ -105,9 +123,9 @@ export default function VisionSection() {
         {/* Vision Statement with Word Animation */}
         <motion.div
           className="max-w-4xl mx-auto mb-16 text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          initial="hidden"
+          whileInView="visible"
+          variants={sentenceVariants}
           viewport={{ once: true }}
           data-testid="vision-statement"
         >
@@ -115,19 +133,8 @@ export default function VisionSection() {
             {words.map((word, index) => (
               <motion.span
                 key={index}
-                className={`inline-block mr-2 ${
-                  index <= currentWordIndex ? 'text-white' : 'text-gray-600'
-                }`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ 
-                  opacity: index <= currentWordIndex ? 1 : 0.3,
-                  y: 0,
-                  color: index === currentWordIndex ? '#d82032' : '#ffffff'
-                }}
-                transition={{ 
-                  duration: 0.5,
-                  delay: index * 0.1
-                }}
+                className="inline-block mr-2"
+                variants={wordVariants}
               >
                 {word}
               </motion.span>

@@ -1,13 +1,15 @@
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, Linkedin } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card } from '@/components/ui/card';
 
-// Corrected import paths using the @assets alias, which points to client/src/assets
-import profileImage1 from '@assets/generated_images/Professional_team_member_headshot_eec4fecb.png';
+// Using the correct asset paths for the images you have
+import profileImage1 from '@assets/generated_images/shashank.svg';
 import profileImage2 from '@assets/generated_images/Female_team_member_headshot_d7adc089.png';
 import profileImage3 from '@assets/generated_images/Developer_team_member_headshot_ce4e0792.png';
-import profileImage4 from '@assets/generated_images/Business_team_member_headshot_748e667b.png';
+import profileImage4 from '@assets/generated_images/sairam.svg';
+import profileImage5 from '@assets/generated_images/sujith.svg';
+import profileImage6 from '@assets/generated_images/rithika.svg';
+import profileImage7 from '@assets/generated_images/sankeerth.svg';
 
 interface TeamMember {
   name: string;
@@ -17,297 +19,140 @@ interface TeamMember {
   linkedin?: string;
 }
 
-interface TeamSectionProps {
-  members?: TeamMember[];
-}
-
-const mockTeamMembers: TeamMember[] = [
-  {
-    name: "Shashank Shilapally",
-    role: "President",
-    img: profileImage1,
-    instagram: "https://instagram.com/shashank_ecell",
-    linkedin: "https://linkedin.com/in/shashank-ecell"
-  },
-  {
-    name: "Anushka Sahoo",
-    role: "Vice President",
-    img: profileImage2,
-    instagram: "https://instagram.com/priya_ecell",
-    linkedin: "https://linkedin.com/in/priya-sharma-ecell"
-  },
-  {
-    name: "Pavan kumar",
-    role: "Creative and Design Lead",
-    img: profileImage3,
-    instagram: "https://instagram.com/arjun_ecell",
-    linkedin: "https://linkedin.com/in/arjun-kumar-ecell"
-  },
-  {
-    name: "M. Sairam",
-    role: "Marketing and PR Lead",
-    img: profileImage4,
-    instagram: "https://instagram.com/sneha_ecell",
-    linkedin: "https://linkedin.com/in/sneha-reddy-ecell"
-  },
-  {
-    name: "Sujith",
-    role: "Social Media Lead",
-    img: profileImage1,
-    instagram: "https://instagram.com/rahul_ecell",
-    linkedin: "https://linkedin.com/in/rahul-gupta-ecell"
-  },
-  {
-    name: "Rithika",
-    role: "Documentation Lead",
-    img: profileImage2,
-    instagram: "https://instagram.com/kavya_ecell",
-    linkedin: "https://linkedin.com/in/kavya-nair-ecell"
-  },
-  {
-    name: "Sankeerth",
-    role: "Event Management Lead",
-    img: profileImage3,
-    instagram: "https://instagram.com/vikram_ecell",
-    linkedin: "https://linkedin.com/in/vikram-singh-ecell"
-  }
+// Using the team member data you provided
+const teamMembers: TeamMember[] = [
+    { name: "Shashank Shilapally", role: "President", img: profileImage1, instagram: "https://www.instagram.com/shashank_6804/?utm_source=ig_web_button_share_sheet", linkedin: "https://www.linkedin.com/in/shashank-shilapally-" },
+    { name: "Anushka Sahoo", role: "Associate President", img: profileImage2, instagram: "https://www.instagram.com/_galaxygroove/?utm_source=ig_web_button_share_sheet", linkedin: "https://linkedin.com/in/priya-sharma-ecell" },
+    { name: "Pavan kumar", role: "Creative and Design Lead", img: profileImage3, instagram: "https://www.instagram.com/pavan_k.t/?utm_source=ig_web_button_share_sheet", linkedin: "https://linkedin.com/in/arjun-kumar-ecell" },
+    { name: "M. Sairam", role: "Marketing and PR Lead", img: profileImage4, instagram: "https://www.instagram.com/__sai_0818?utm_source=ig_web_button_share_sheet&igsh=cHc1am82bXliaDFn", linkedin: "https://linkedin.com/in/sneha-reddy-ecell" },
+    { name: "Sujith", role: "Social Media Lead", img: profileImage5, instagram: "https://www.instagram.com/sujzzzt?utm_source=ig_web_button_share_sheet&igsh=MWpvdmIyaWc3OTlkdg==", linkedin: "https://linkedin.com/in/rahul-gupta-ecell" },
+    { name: "Rithika", role: "Documentation Lead", img: profileImage6, instagram: "https://www.instagram.com/rithikasunkari?utm_source=ig_web_button_share_sheet&igsh=MXZicnFlZDZ3NmlzNw==", linkedin: "https://linkedin.com/in/kavya-nair-ecell" },
+    { name: "Sankeerth", role: "Event Management Lead", img: profileImage7, instagram: "https://www.instagram.com/sankeerth__chowdary/?utm_source=ig_web_button_share_sheet", linkedin: "https://linkedin.com/in/vikram-singh-ecell" }
 ];
 
-export default function TeamSection({ members = mockTeamMembers }: TeamSectionProps) {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1
-      }
-    }
-  };
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0,
+    scale: 0.8,
+  }),
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1,
+    scale: 1,
+  },
+  exit: (direction: number) => ({
+    zIndex: 0,
+    x: direction < 0 ? '100%' : '-100%',
+    opacity: 0,
+    scale: 0.8,
+  }),
+};
 
-  const cardVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 80,
-      scale: 0.8,
-      rotateY: 25,
-      rotateX: 10
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      rotateY: 0,
-      rotateX: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut",
-        type: "spring",
-        stiffness: 100,
-        damping: 15
-      }
-    }
-  };
+export default function TeamSection() {
+    const [[page, direction], setPage] = useState([0, 0]);
 
-  const handleSocialClick = (url: string, platform: string, memberName: string) => {
-    console.log(`Opening ${platform} profile for ${memberName}: ${url}`);
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
+    const paginate = (newDirection: number) => {
+        setPage([(page + newDirection + teamMembers.length) % teamMembers.length, newDirection]);
+    };
+    
+    const memberIndex = page;
+    const member = teamMembers[memberIndex];
+    
+    // Get previous and next members for the side cards
+    const prevMemberIndex = (memberIndex - 1 + teamMembers.length) % teamMembers.length;
+    const nextMemberIndex = (memberIndex + 1) % teamMembers.length;
+    const prevMember = teamMembers[prevMemberIndex];
+    const nextMember = teamMembers[nextMemberIndex];
 
-  return (
-    <section className="py-16 md:py-24 px-4" data-testid="team-section">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4" data-testid="team-title">
-            Meet Our Team
-          </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto" data-testid="team-description">
-            Passionate innovators driving entrepreneurship and fostering the next generation of startups
-          </p>
-        </motion.div>
-
-        {/* Team Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          data-testid="team-grid"
-        >
-          {members.map((member, index) => (
-            <motion.div
-              key={`${member.name}-${index}`}
-              variants={cardVariants}
-              whileHover={{ 
-                scale: 1.08,
-                y: -12,
-                rotateX: 8,
-                rotateY: 5,
-                z: 50,
-                transition: { 
-                  duration: 0.4,
-                  type: "spring",
-                  stiffness: 150
-                }
-              }}
-              style={{
-                transformStyle: "preserve-3d"
-              }}
-              data-testid={`team-card-${index}`}
-            >
-              <Card className="bg-card border-card-border hover:border-primary/70 transition-all duration-500 overflow-hidden group hover-elevate relative">
-                {/* Floating Particles */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                  {[...Array(8)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute w-1 h-1 bg-primary rounded-full"
-                      style={{
-                        left: `${20 + Math.random() * 60}%`,
-                        top: `${20 + Math.random() * 60}%`,
-                      }}
-                      animate={{
-                        y: [-10, -20, -10],
-                        opacity: [0, 1, 0],
-                        scale: [0, 1, 0]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        delay: i * 0.2,
-                        ease: "easeInOut"
-                      }}
-                    />
-                  ))}
-                </div>
-
-                {/* Animated Border Glow */}
+    return (
+        <section className="py-16 md:py-24 flex flex-col justify-center items-center min-h-screen relative overflow-hidden" data-testid="team-section" style={{ perspective: '1200px' }}>
+            <div className="max-w-7xl mx-auto px-4 text-center mb-8">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Meet Our Team</h2>
+                <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                    The driving force behind our mission
+                </p>
+            </div>
+            
+            <div className="relative w-full h-[65vh] md:h-[70vh] flex items-center justify-center">
+                {/* Previous Card */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100"
-                  animate={{
-                    background: [
-                      'linear-gradient(0deg, rgba(216, 32, 50, 0.2) 0%, transparent 50%, rgba(216, 32, 50, 0.2) 100%)',
-                      'linear-gradient(90deg, rgba(216, 32, 50, 0.2) 0%, transparent 50%, rgba(216, 32, 50, 0.2) 100%)',
-                      'linear-gradient(180deg, rgba(216, 32, 50, 0.2) 0%, transparent 50%, rgba(216, 32, 50, 0.2) 100%)',
-                      'linear-gradient(270deg, rgba(216, 32, 50, 0.2) 0%, transparent 50%, rgba(216, 32, 50, 0.2) 100%)',
-                      'linear-gradient(0deg, rgba(216, 32, 50, 0.2) 0%, transparent 50%, rgba(216, 32, 50, 0.2) 100%)'
-                    ]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                />
+                    key={prevMemberIndex}
+                    initial={{ scale: 0, x: '-50%', opacity: 0 }}
+                    animate={{ scale: 0.7, x: '-80%', opacity: 0.2, rotateY: 30 }}
+                    transition={{ duration: 0.4 }}
+                    className="w-[70vw] md:w-[380px] h-[90vw] md:h-[520px] absolute"
+                    style={{ transformOrigin: 'center right', zIndex: 0 }}
+                >
+                     <div className="w-full h-full glass-card rounded-3xl overflow-hidden relative shadow-lg">
+                        <img src={prevMember.img} alt={prevMember.name} className="w-full h-full object-cover" />
+                     </div>
+                </motion.div>
 
-                <div className="p-6 text-center relative z-10">
-                  {/* Profile Image with Enhanced Animation */}
-                  <div className="relative mb-6 mx-auto w-32 h-32">
-                    {/* Rotating Rings */}
+                {/* Next Card */}
+                <motion.div
+                    key={nextMemberIndex}
+                    initial={{ scale: 0, x: '50%', opacity: 0 }}
+                    animate={{ scale: 0.7, x: '80%', opacity: 0.2, rotateY: -30 }}
+                    transition={{ duration: 0.4 }}
+                    className="w-[70vw] md:w-[380px] h-[90vw] md:h-[520px] absolute"
+                    style={{ transformOrigin: 'center left', zIndex: 0 }}
+                >
+                     <div className="w-full h-full glass-card rounded-3xl overflow-hidden relative shadow-lg">
+                        <img src={nextMember.img} alt={nextMember.name} className="w-full h-full object-cover" />
+                     </div>
+                </motion.div>
+
+                {/* Center Card */}
+                <AnimatePresence initial={false} custom={direction}>
                     <motion.div
-                      className="absolute inset-0 rounded-full border-2 border-primary/30"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                    />
-                    <motion.div
-                      className="absolute inset-2 rounded-full border border-primary/20"
-                      animate={{ rotate: -360 }}
-                      transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                    />
-                    
-                    {/* Pulsing Glow */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-primary/5 blur-sm"
-                      initial={{ scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      transition={{ delay: index * 0.1, duration: 0.5 }}
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 0.8, 0.5]
-                      }}
-                      style={{
-                        animationDelay: `${index * 0.5}s`,
-                        animationDuration: '2s',
-                        animationIterationCount: 'infinite'
-                      }}
-                    />
-                    
-                    <motion.div
-                      whileHover={{
-                        scale: 1.1,
-                        rotateY: 15,
-                        rotateX: 5,
-                        boxShadow: "0 20px 40px rgba(216, 32, 50, 0.3)"
-                      }}
-                      transition={{ duration: 0.3 }}
+                        key={page}
+                        custom={direction}
+                        variants={variants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{
+                            x: { type: "spring", stiffness: 300, damping: 30 },
+                            opacity: { duration: 0.2 }
+                        }}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.5}
+                        onDragEnd={(e, { offset, velocity }) => {
+                            const swipeThreshold = 50;
+                            const swipePower = Math.abs(offset.x) * velocity.x;
+                            if (swipePower < -swipeThreshold) paginate(1);
+                            else if (swipePower > swipeThreshold) paginate(-1);
+                        }}
+                        className="w-[70vw] md:w-[380px] h-[90vw] md:h-[520px] absolute cursor-grab active:cursor-grabbing"
                     >
-                      <Avatar className="w-32 h-32 border-2 border-primary/20 group-hover:border-primary transition-all duration-300 relative z-10">
-                        <AvatarImage 
-                          src={member.img} 
-                          alt={`${member.name} profile picture`}
-                          className="object-cover"
-                        />
-                        <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                          {member.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
+                        <div className="w-full h-full glass-card rounded-3xl overflow-hidden relative shadow-2xl shadow-primary/20">
+                            <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 flex flex-col justify-end">
+                                <h3 className="text-3xl font-bold text-white">{member.name}</h3>
+                                <p className="text-xl text-primary">{member.role}</p>
+                                <div className="flex gap-4 mt-4">
+                                    {member.instagram && (
+                                        <motion.a href={member.instagram} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.2, color: '#E4405F' }} className="text-white">
+                                            <Instagram size={24} />
+                                        </motion.a>
+                                    )}
+                                    {member.linkedin && (
+                                        <motion.a href={member.linkedin} target="_blank" rel="noopener noreferrer" whileHover={{ scale: 1.2, color: '#0A66C2' }} className="text-white">
+                                            <Linkedin size={24} />
+                                        </motion.a>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </motion.div>
-                  </div>
-
-                  {/* Member Info */}
-                  <h3 className="text-xl font-semibold text-white mb-2" data-testid={`member-name-${index}`}>
-                    {member.name}
-                  </h3>
-                  <p className="text-gray-400 mb-4" data-testid={`member-role-${index}`}>
-                    {member.role}
-                  </p>
-
-                  {/* Social Icons */}
-                  <motion.div 
-                    className="flex justify-center gap-4"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
-                  >
-                    {member.instagram && (
-                      <motion.button
-                        onClick={() => handleSocialClick(member.instagram!, 'Instagram', member.name)}
-                        className="p-2 text-white hover:text-[#E4405F] transition-colors duration-300 hover:shadow-[0_0_15px_#E4405F40] rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        whileHover={{ y: -2, scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        aria-label={`${member.name}'s Instagram profile`}
-                        data-testid={`instagram-link-${index}`}
-                      >
-                        <Instagram size={20} />
-                      </motion.button>
-                    )}
-                    {member.linkedin && (
-                      <motion.button
-                        onClick={() => handleSocialClick(member.linkedin!, 'LinkedIn', member.name)}
-                        className="p-2 text-white hover:text-[#0A66C2] transition-colors duration-300 hover:shadow-[0_0_15px_#0A66C240] rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        whileHover={{ y: -2, scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        aria-label={`${member.name}'s LinkedIn profile`}
-                        data-testid={`linkedin-link-${index}`}
-                      >
-                        <Linkedin size={20} />
-                      </motion.button>
-                    )}
-                  </motion.div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
+                </AnimatePresence>
+            </div>
+             <div className="mt-8 text-gray-500 font-mono text-sm">
+                ‹ drag or swipe ›
+             </div>
+        </section>
+    );
 }

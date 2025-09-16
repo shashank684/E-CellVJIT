@@ -9,15 +9,13 @@ import {
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 
-// modify the interface with any CRUD methods
-// you might need
-
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
   getContactSubmissions(): Promise<ContactSubmission[]>;
+  deleteContactSubmission(id: string): Promise<{ success: boolean }>; // Added this line
 }
 
 export class DatabaseStorage implements IStorage {
@@ -43,6 +41,12 @@ export class DatabaseStorage implements IStorage {
 
   async getContactSubmissions(): Promise<ContactSubmission[]> {
     return await db.select().from(contactSubmissions).orderBy(contactSubmissions.createdAt);
+  }
+
+  // Added this method
+  async deleteContactSubmission(id: string): Promise<{ success: boolean }> {
+    await db.delete(contactSubmissions).where(eq(contactSubmissions.id, id));
+    return { success: true };
   }
 }
 

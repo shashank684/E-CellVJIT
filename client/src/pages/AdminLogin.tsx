@@ -54,6 +54,7 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
       const result = await response.json();
       
       if (result.success) {
+        localStorage.setItem('admin-token', result.token);
         toast({
           title: 'Login successful',
           description: 'Welcome to the admin dashboard',

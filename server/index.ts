@@ -1,31 +1,11 @@
-import express, { type Request, Response, NextFunction } from "express";
-import session from "express-session";
-import connectPgSimple from 'connect-pg-simple';
+import express from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { pool } from './db'; // Import the database pool
+import { type Server } from "http";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// Session configuration
-const PGStore = connectPgSimple(session);
-const store = new PGStore({
-  pool: pool, // Use the existing database pool
-  tableName: 'sessions', // Name of the session table
-});
-
-app.use(session({
-  store: store, // Use the new PostgreSQL store
-  secret: process.env.SESSION_SECRET || 'fallback-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // Set to true in production with HTTPS
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-  }
-}));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -58,19 +38,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  const server: Server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {

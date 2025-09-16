@@ -376,7 +376,6 @@
   /* UPDATED: Enhanced the red glow effect */
   text-shadow: 0 0 15px rgba(216, 32, 50, 0.5), 0 0 30px rgba(216, 32, 50, 0.3);
 }
-
 .stardust-char {
   display: inline-block;
   opacity: 0;
@@ -391,8 +390,28 @@
     transform: rotate(360deg) translateX(150px) rotate(-360deg);
   }
 }
-
 .orbiting-item {
   position: absolute;
   animation: orbit 20s linear infinite;
+}
+.spotlight {
+  background: radial-gradient(circle at var(--x) var(--y), rgba(216, 32, 50, 0.25) 0%, transparent 40%);
+}
+.carousel-button {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.carousel-button:hover {
+    background-color: rgba(216, 32, 50, 0.5);
+    border-color: rgba(216, 32, 50, 1);
+}
+.glass-card {
+  /* Semi-transparent dark background with a blur effect */
+  background: rgba(20, 20, 22, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  /* A subtle border to give it an edge */
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }

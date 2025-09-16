@@ -18,7 +18,7 @@ interface Event {
 const mockEvents: Event[] = [
   {
     id: '1',
-    title: 'Nirman Hackathon 2025',
+    title: 'Hackathon 2025',
     date: '2025-02-15',
     description: '48-hour hackathon focusing on building innovative solutions for real-world problems with prizes worth ₹1 lakh.',
     status: 'upcoming'
