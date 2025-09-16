@@ -1,200 +1,132 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
+// --- DATA ---
 interface Event {
   id: string;
   title: string;
   date: string;
   description: string;
   status: 'upcoming' | 'past';
-  image?: string;
 }
 
-// Mock data for development
 const mockEvents: Event[] = [
-  {
-    id: '1',
-    title: 'Hackathon 2025',
-    date: '2025-02-15',
-    description: '48-hour hackathon focusing on building innovative solutions for real-world problems with prizes worth ₹1 lakh.',
-    status: 'upcoming'
-  },
-  {
-    id: '2', 
-    title: 'PitchQuest',
-    date: '2025-01-20',
-    description: 'Startup pitch competition where entrepreneurs present their ideas to industry experts and investors.',
-    status: 'upcoming'
-  },
-  {
-    id: '3',
-    title: 'Startup Workshop Series',
-    date: '2024-12-10',
-    description: 'Monthly workshop series covering ideation, market research, funding, and scaling strategies for entrepreneurs.',
-    status: 'past'
-  },
-  {
-    id: '4',
-    title: 'Innovation Summit 2024',
-    date: '2024-11-25',
-    description: 'Two-day summit featuring keynote speakers, panel discussions, and networking opportunities with industry leaders.',
-    status: 'past'
-  }
+  { id: '1', title: 'Nirman Hackathon 2025', date: '2025-02-15', description: 'A 48-hour hackathon to build innovative solutions for real-world problems. Prizes worth ₹1 lakh.', status: 'upcoming' },
+  { id: '2', title: 'PitchQuest: The Ultimate Showdown', date: '2025-01-20', description: 'Present your startup ideas to a panel of industry experts and investors in this high-stakes pitch competition.', status: 'upcoming' },
+  { id: '3', title: 'Startup Workshop Series', date: '2024-12-10', description: 'A series of workshops covering ideation, market research, funding, and scaling strategies.', status: 'past' },
+  { id: '4', title: 'Innovation Summit 2024', date: '2024-11-25', description: 'A two-day summit with keynote speakers, panel discussions, and networking opportunities.', status: 'past' },
 ];
 
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0,
+    scale: 0.8
+  }),
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1,
+    scale: 1
+  },
+  exit: (direction: number) => ({
+    zIndex: 0,
+    x: direction < 0 ? '100%' : '-100%',
+    opacity: 0,
+    scale: 0.8
+  }),
+};
+
+// --- Main Section Component ---
 export default function EventsSection() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [[page, direction], setPage] = useState([0, 0]);
 
-  const nextEvent = () => {
-    setCurrentIndex((prev) => (prev + 1) % mockEvents.length);
+  const paginate = (newDirection: number) => {
+    setPage([(page + newDirection + mockEvents.length) % mockEvents.length, newDirection]);
   };
 
-  const prevEvent = () => {
-    setCurrentIndex((prev) => (prev - 1 + mockEvents.length) % mockEvents.length);
-  };
-
-  const handleViewDetails = (eventId: string) => {
-    console.log(`View details clicked for event: ${eventId}`);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
+  const event = mockEvents[page];
+  const isUpcoming = event.status === 'upcoming';
 
   return (
-    <section className="py-16 md:py-24 px-4" data-testid="events-section">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
+    <section className="py-16 md:py-24 relative overflow-hidden" data-testid="events-section">
+      <div className="max-w-7xl mx-auto px-4 text-center mb-12">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
+          className="text-4xl md:text-5xl font-bold text-white mb-4"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4" data-testid="events-title">
-            Events & Activities
-          </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto" data-testid="events-description">
-            Join our workshops, competitions, and networking events to accelerate your entrepreneurial journey
-          </p>
-        </motion.div>
-
-        {/* Featured Event Carousel */}
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          Our Events
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           viewport={{ once: true }}
+          className="text-xl text-gray-400 max-w-2xl mx-auto"
         >
-          <div className="relative overflow-hidden rounded-xl" data-testid="event-carousel">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, x: 300 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -300 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-              >
-                <Card className="bg-card border-card-border p-8 md:p-12">
-                  <div className="grid md:grid-cols-2 gap-8 items-center">
-                    <div>
-                      <div className="flex items-center gap-3 mb-4">
-                        <Badge 
-                          variant={mockEvents[currentIndex].status === 'upcoming' ? 'default' : 'secondary'}
-                          className={mockEvents[currentIndex].status === 'upcoming' ? 'bg-primary text-white' : ''}
-                          data-testid="event-status-badge"
-                        >
-                          {mockEvents[currentIndex].status === 'upcoming' ? 'Upcoming' : 'Past Event'}
-                        </Badge>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {formatDate(mockEvents[currentIndex].date)}
-                        </div>
-                      </div>
-                      
-                      <h3 className="text-3xl font-bold text-white mb-4" data-testid="featured-event-title">
-                        {mockEvents[currentIndex].title}
-                      </h3>
-                      
-                      <p className="text-gray-300 text-lg mb-6" data-testid="featured-event-description">
-                        {mockEvents[currentIndex].description}
-                      </p>
-                      
-                      <Button
-                        onClick={() => handleViewDetails(mockEvents[currentIndex].id)}
-                        className={`${
-                          mockEvents[currentIndex].status === 'upcoming' 
-                            ? 'bg-primary hover:bg-primary/90 shadow-[0_0_20px_theme(colors.primary/30%)]' 
-                            : 'bg-gray-600 hover:bg-gray-500'
-                        } text-white font-medium`}
-                        data-testid="button-view-details"
-                      >
-                        {mockEvents[currentIndex].status === 'upcoming' ? 'Register Now' : 'View Details'}
-                        <ExternalLink className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                    
-                    <div className="relative">
-                      <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center">
-                        <div className="text-center">
-                          <Calendar className="w-16 h-16 text-primary mb-4 mx-auto" />
-                          <p className="text-gray-400">Event Image Placeholder</p>
-                        </div>
-                      </div>
-                    </div>
+          A timeline of our flagship events and workshops.
+        </motion.p>
+      </div>
+
+      <div className="relative h-[500px] flex items-center justify-center">
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.div
+            key={page}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+            }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.5}
+            onDragEnd={(e, { offset, velocity }) => {
+                const swipe = Math.abs(offset.x) * velocity.x;
+                if (swipe < -10000) {
+                    paginate(1);
+                } else if (swipe > 10000) {
+                    paginate(-1);
+                }
+            }}
+            className="w-[360px] md:w-[480px] h-[450px] absolute"
+          >
+            <div className={cn( "h-full w-full rounded-2xl p-6 md:p-8 flex flex-col justify-between transition-all duration-300", "glass-card border-t-4", isUpcoming ? 'border-primary' : 'border-gray-600' )}>
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <Badge variant={isUpcoming ? 'default' : 'secondary'} className={`border-none ${isUpcoming ? 'bg-primary/20 text-primary' : 'bg-gray-700/50 text-gray-300'}`}>
+                    {isUpcoming ? 'Upcoming' : 'Completed'}
+                  </Badge>
+                  <div className="flex items-center text-gray-400 text-sm font-mono">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    {event.date}
                   </div>
-                </Card>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Navigation Buttons */}
-            <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex justify-between pointer-events-none">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={prevEvent}
-                className="pointer-events-auto bg-black/50 border-white/20 text-white hover:bg-black/70 hover:border-primary"
-                data-testid="button-prev-event"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={nextEvent}
-                className="pointer-events-auto bg-black/50 border-white/20 text-white hover:bg-black/70 hover:border-primary"
-                data-testid="button-next-event"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">{event.title}</h3>
+                <p className="text-gray-300 leading-relaxed">{event.description}</p>
+              </div>
+              <div className="flex justify-end">
+                <Button className={`group ${isUpcoming ? 'bg-primary hover:bg-primary/90' : 'bg-gray-600/50 hover:bg-gray-600'}`}>
+                  {isUpcoming ? 'Register Now' : 'Know More'}
+                  <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                </Button>
+              </div>
             </div>
-
-            {/* Carousel Indicators */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {mockEvents.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                    index === currentIndex ? 'bg-primary' : 'bg-white/30'
-                  }`}
-                  data-testid={`carousel-indicator-${index}`}
-                />
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <div className="text-center mt-8 text-gray-500 font-mono text-sm">
+        ‹ drag or swipe to explore ›
       </div>
     </section>
   );

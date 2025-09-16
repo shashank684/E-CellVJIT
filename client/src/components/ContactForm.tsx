@@ -3,11 +3,10 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Send, Mail, Phone, MapPin } from 'lucide-react';
+import { Send, Mail, Phone, MapPin, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import {
   Form,
@@ -41,7 +40,7 @@ export default function ContactForm() {
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -50,9 +49,9 @@ export default function ContactForm() {
         },
         body: JSON.stringify(data),
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         toast({
           title: 'Message sent successfully!',
@@ -87,22 +86,27 @@ export default function ContactForm() {
     },
     {
       icon: Phone,
-      label: 'Phone',
-      value: '+91 9876543210',
-      href: 'tel:+919876543210'
+      label: 'Shashank',
+      value: '+91 9032421469',
+      href: 'tel:+919032421469'
+    },
+    {
+        icon: Phone,
+        label: 'Anushka',
+        value: '+91 1234567890',
+        href: 'tel:+911234567890'
     },
     {
       icon: MapPin,
       label: 'Address',
       value: 'VJIT Campus, Hyderabad, Telangana',
-      href: 'https://maps.google.com/'
+      href: 'https://maps.app.goo.gl/3Zvaj3Ua8yXLFGUw9'
     }
   ];
 
   return (
-    <section className="py-16 md:py-24 px-4 bg-black" data-testid="contact-section">
+    <section className="py-16 md:py-24 px-4" data-testid="contact-section">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -118,125 +122,28 @@ export default function ContactForm() {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Contact Form */}
+        <div className="grid lg:grid-cols-5 gap-12 items-start">
+          {/* Contact Information & Socials */}
           <motion.div
+            className="lg:col-span-2 space-y-12"
             initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <Card className="bg-card border-card-border p-8">
-              <h3 className="text-2xl font-semibold text-white mb-6" data-testid="form-title">
-                Send us a message
-              </h3>
-              
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="contact-form">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white">Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Your full name"
-                            className="bg-background border-input text-white placeholder:text-gray-400"
-                            data-testid="input-name"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white">Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="your.email@example.com"
-                            className="bg-background border-input text-white placeholder:text-gray-400"
-                            data-testid="input-email"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white">Message</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Tell us about your idea or question..."
-                            className="bg-background border-input text-white placeholder:text-gray-400 min-h-32 resize-none"
-                            data-testid="input-message"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3"
-                    data-testid="button-submit"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <motion.div
-                          className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4 mr-2" />
-                        Send Message
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </Form>
-            </Card>
-          </motion.div>
-
-          {/* Contact Information */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
-            className="space-y-8"
           >
             <div>
               <h3 className="text-2xl font-semibold text-white mb-6" data-testid="contact-info-title">
                 Contact Information
               </h3>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {contactInfo.map((info, index) => (
                   <motion.a
                     key={info.label}
                     href={info.href}
-                    className="flex items-center gap-4 p-4 rounded-lg bg-card/50 border border-card-border hover:border-primary/50 transition-colors duration-300 group hover-elevate"
-                    whileHover={{ x: 8 }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 p-4 rounded-lg bg-card/50 hover:bg-card/80 border border-card-border hover:border-primary/50 transition-all duration-300 group"
+                    whileHover={{ x: 5, scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                     data-testid={`contact-info-${index}`}
                   >
@@ -251,26 +158,105 @@ export default function ContactForm() {
                 ))}
               </div>
             </div>
+          </motion.div>
 
-            {/* Social Media Links */}
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4" data-testid="social-title">
-                Follow Us
-              </h4>
-              <div className="flex gap-4">
-                {['Instagram', 'LinkedIn', 'Twitter'].map((platform) => (
-                  <motion.button
-                    key={platform}
-                    className="w-12 h-12 bg-card border border-card-border rounded-lg flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/50 transition-colors duration-300 hover-elevate"
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => console.log(`${platform} clicked`)}
-                    data-testid={`social-${platform.toLowerCase()}`}
+          {/* Contact Form */}
+          <motion.div
+            className="lg:col-span-3"
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <div className="p-8 rounded-xl bg-black/30 backdrop-blur-lg border border-white/10">
+              <h3 className="text-2xl font-semibold text-white mb-6" data-testid="form-title">
+                Send us a message
+              </h3>
+              
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="contact-form">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Your full name"
+                            className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 focus:border-primary"
+                            data-testid="input-name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="your.email@example.com"
+                            className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 focus:border-primary"
+                            data-testid="input-email"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Message</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Tell us about your idea or question..."
+                            className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 min-h-32 resize-none focus:border-primary"
+                            data-testid="input-message"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 text-lg group transition-all duration-300"
+                    data-testid="button-submit"
                   >
-                    <span className="text-sm font-medium">{platform[0]}</span>
-                  </motion.button>
-                ))}
-              </div>
+                    {isSubmitting ? (
+                      <>
+                        <motion.div
+                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 mr-2 transition-transform duration-300 group-hover:translate-x-1" />
+                        Send Message
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </div>
           </motion.div>
         </div>

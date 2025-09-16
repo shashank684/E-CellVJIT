@@ -14,8 +14,8 @@ import TeamSection from "@/components/TeamSection";
 import EventsSection from "@/components/EventsSection";
 import ContactForm from "@/components/ContactForm";
 import { Logo } from './components/Logo';
-// Import the new InteractiveBackground component
 import { InteractiveBackground } from './components/InteractiveBackground';
+import { Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const Admin = lazy(() => import("@/pages/Admin"));
 const NotFound = lazy(() => import("@/pages/not-found"));
@@ -63,6 +63,12 @@ function HomePage() {
       });
     };
   }, []);
+  
+  const socialLinks = [
+    { icon: Instagram, href: 'https://www.instagram.com/ecell_vjit?utm_source=ig_web_button_share_sheet&igsh=ZGFzamRrMnZoejRm' },
+    { icon: Linkedin, href: 'https://www.linkedin.com/company/e-cell-vjit/' },
+    { icon: Youtube, href: 'https://youtube.com/@e-cellvjit?si=Hq10nBKwFHNVylZ0' }
+  ];
 
   return (
     <div className="min-h-screen text-white relative z-10 pt-24">
@@ -77,105 +83,78 @@ function HomePage() {
       <section id="events"><EventsSection /></section>
       <section id="contact"><ContactForm /></section>
       
-      {/* Restored Footer Section */}
-      <footer className="relative border-t border-primary/20 overflow-hidden bg-black">
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
+      <footer className="relative border-t border-primary/20 overflow-hidden bg-black/50 backdrop-blur-lg">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-3 gap-8 text-center md:text-left">
             <motion.div
-              className="md:col-span-2"
+              className="flex flex-col items-center md:items-start"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <div className="flex items-center gap-4 mb-6">
-                <Logo className="w-20 h-20" />
+              <div className="flex items-center gap-4 mb-4">
+                <Logo className="w-16 h-16" />
                 <div>
                   <h3 className="text-2xl font-bold text-white">E-Cell VJIT</h3>
-                  <p className="text-primary text-sm">Innovation • Entrepreneurship • Future</p>
+                  <p className="text-primary text-sm">Where Ideas Take Off</p>
                 </div>
               </div>
-              <p className="text-gray-400 leading-relaxed max-w-md">
-                Fostering the next generation of entrepreneurs through innovation, mentorship, and collaborative growth at Vignan's Institute of Information Technology.
+              <p className="text-gray-400 leading-relaxed max-w-xs text-sm">
+                Fostering the next generation of entrepreneurs through innovation, mentorship, and collaborative growth.
               </p>
             </motion.div>
+            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
+              className="flex flex-col items-center"
             >
               <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                {['About', 'Vision', 'Team', 'Contact'].map((link) => (
-                  <motion.li key={link}>
-                    <motion.button
+                {['About', 'Vision', 'Team', 'Events', 'Contact'].map((link) => (
+                  <li key={link}>
+                    <button
                       onClick={() => handleSectionChange(link.toLowerCase())}
-                      className="text-gray-400 hover:text-primary transition-colors duration-300 text-left"
-                      whileHover={{ x: 5 }}
-                      transition={{ duration: 0.2 }}
+                      className="text-gray-400 hover:text-primary transition-colors duration-300"
                     >
                       {link}
-                    </motion.button>
-                  </motion.li>
+                    </button>
+                  </li>
                 ))}
               </ul>
             </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
+              className="flex flex-col items-center md:items-end"
             >
-              <h4 className="text-lg font-semibold text-white mb-4">Connect</h4>
-              <div className="space-y-3">
-                <motion.div
-                  className="flex items-center gap-3 text-gray-400"
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-sm">ecell@vjit.ac.in</span>
-                </motion.div>
-                <motion.div
-                  className="flex items-center gap-3 text-gray-400"
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-sm">VJIT Campus, Hyderabad</span>
-                </motion.div>
-                <div className="flex gap-3 mt-4">
-                  {['Instagram', 'LinkedIn', 'Twitter'].map((platform, index) => (
-                    <motion.button
-                      key={platform}
-                      className="w-10 h-10 bg-card border border-card-border rounded-lg flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/50 transition-all duration-300"
-                      whileHover={{ scale: 1.1, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      animate={{
-                        boxShadow: [
-                          '0 0 0px rgba(216, 32, 50, 0)',
-                          '0 0 10px rgba(216, 32, 50, 0.2)',
-                          '0 0 0px rgba(216, 32, 50, 0)'
-                        ]
-                      }}
-                      transition={{
-                        boxShadow: {
-                          duration: 2,
-                          repeat: Infinity,
-                          delay: index * 0.5
-                        }
-                      }}
-                    >
-                      <span className="text-xs font-bold">{platform[0]}</span>
-                    </motion.button>
-                  ))}
-                </div>
+                <h4 className="text-lg font-semibold text-white mb-4">Follow Us</h4>
+                <div className="flex gap-4">
+                 {socialLinks.map((social, index) => (
+                  <motion.a
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-card/50 border border-card-border rounded-lg flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/50 transition-colors duration-300"
+                    whileHover={{ scale: 1.15, y: -4, rotate: 5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <social.icon className="w-6 h-6" />
+                  </motion.a>
+                ))}
               </div>
             </motion.div>
           </div>
           <motion.div
-            className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4"
+            className="pt-8 mt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}

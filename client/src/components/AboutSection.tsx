@@ -131,7 +131,7 @@ export default function AboutSection() {
           </motion.div>
 
           <motion.div
-            className="space-y-8"
+            className="space-y-8 text-center lg:text-left"
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
