@@ -17,9 +17,22 @@ export const InteractiveBackground = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
+    // Create a circular texture for the stars
+    const canvas = document.createElement('canvas');
+    canvas.width = 16;
+    canvas.height = 16;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.beginPath();
+      ctx.arc(8, 8, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+    }
+    const starTexture = new THREE.CanvasTexture(canvas);
+
     // Star generation
     const starVertices = [];
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 15000; i++) { // Increased star count for more density
       const x = (Math.random() - 0.5) * 2000;
       const y = (Math.random() - 0.5) * 2000;
       const z = (Math.random() - 0.5) * 2000;
@@ -31,7 +44,10 @@ export const InteractiveBackground = () => {
     
     const starMaterial = new THREE.PointsMaterial({
       color: 0xffffff,
-      size: 0.7,
+      size: 0.8, // Slightly larger size for brightness
+      map: starTexture,
+      transparent: true,
+      alphaTest: 0.5,
     });
 
     const stars = new THREE.Points(starGeometry, starMaterial);
@@ -41,14 +57,11 @@ export const InteractiveBackground = () => {
     const mouse = new THREE.Vector2();
 
     const onMouseMove = (event: MouseEvent) => {
-      // Normalize mouse position from -1 to +1
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     };
     
-    // --- NEW: Touch event handler ---
     const onTouchMove = (event: TouchEvent) => {
-      // Use the first touch point
       if (event.touches.length > 0) {
         mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
@@ -56,7 +69,7 @@ export const InteractiveBackground = () => {
     };
 
     window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('touchmove', onTouchMove); // --- NEW: Add touch listener ---
+    window.addEventListener('touchmove', onTouchMove);
     
     // Resize handler
     const onWindowResize = () => {
@@ -69,15 +82,10 @@ export const InteractiveBackground = () => {
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
-
-      // Add a slow, constant rotation
       stars.rotation.y += 0.0001;
-
-      // Parallax effect based on mouse or touch position
       camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.02;
       camera.position.y += (mouse.y * 0.5 - camera.position.y) * 0.02;
       camera.lookAt(scene.position);
-
       renderer.render(scene, camera);
     };
     animate();
@@ -86,7 +94,7 @@ export const InteractiveBackground = () => {
     const mount = mountRef.current;
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('touchmove', onTouchMove); // --- NEW: Remove touch listener on cleanup ---
+      window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('resize', onWindowResize);
       if (mount) {
         mount.removeChild(renderer.domElement);
