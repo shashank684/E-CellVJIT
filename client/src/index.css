@@ -420,3 +420,16 @@
   /* A subtle border to give it an edge */
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+.vision-item-container {
+  background: rgba(20, 20, 22, 0.4); /* Frosted glass effect */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.vision-item-container:hover {
+  background: rgba(20, 20, 22, 0.6);
+  border-color: rgba(216, 32, 50, 0.5);
+  transform: translateY(-5px);
+}

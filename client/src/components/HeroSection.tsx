@@ -4,8 +4,9 @@ import { ChevronRight } from 'lucide-react';
 
 export default function HeroSection() {
   const handleJoinMovement = () => {
-    // This can be updated later to link to a registration or community page
-    console.log('Join the Community clicked');
+     // --- MODIFIED: Opens the specified WhatsApp group link in a new tab ---
+    const whatsappGroupLink = "https://chat.whatsapp.com/H4qzSts0A9fEIGE0xmsxrH?mode=ems_copy_t"; // <-- REPLACE WITH YOUR LINK
+    window.open(whatsappGroupLink, '_blank', 'noopener,noreferrer');
   };
 
   const handleExploreEvents = () => {

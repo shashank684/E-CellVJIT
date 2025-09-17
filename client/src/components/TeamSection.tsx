@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, Linkedin } from 'lucide-react';
 
-// Using the correct asset paths for the images you have
+// Using the correct asset paths for all team members
 import profileImage1 from '@assets/generated_images/shashank.svg';
-import profileImage2 from '@assets/generated_images/Female_team_member_headshot_d7adc089.png';
-import profileImage3 from '@assets/generated_images/Developer_team_member_headshot_ce4e0792.png';
+import profileImage2 from '@assets/generated_images/anushka.svg'; // Corrected path for Anushka
+import profileImage3 from '@assets/generated_images/pavan.svg'; // Corrected path for Pavan
 import profileImage4 from '@assets/generated_images/sairam.svg';
 import profileImage5 from '@assets/generated_images/sujith.svg';
 import profileImage6 from '@assets/generated_images/rithika.svg';
@@ -19,7 +19,6 @@ interface TeamMember {
   linkedin?: string;
 }
 
-// Using the team member data you provided
 const teamMembers: TeamMember[] = [
     { name: "Shashank Shilapally", role: "President", img: profileImage1, instagram: "https://www.instagram.com/shashank_6804/?utm_source=ig_web_button_share_sheet", linkedin: "https://www.linkedin.com/in/shashank-shilapally-" },
     { name: "Anushka Sahoo", role: "Associate President", img: profileImage2, instagram: "https://www.instagram.com/_galaxygroove/?utm_source=ig_web_button_share_sheet", linkedin: "https://linkedin.com/in/priya-sharma-ecell" },
@@ -60,7 +59,6 @@ export default function TeamSection() {
     const memberIndex = page;
     const member = teamMembers[memberIndex];
     
-    // Get previous and next members for the side cards
     const prevMemberIndex = (memberIndex - 1 + teamMembers.length) % teamMembers.length;
     const nextMemberIndex = (memberIndex + 1) % teamMembers.length;
     const prevMember = teamMembers[prevMemberIndex];
@@ -69,14 +67,18 @@ export default function TeamSection() {
     return (
         <section className="py-16 md:py-24 flex flex-col justify-center items-center min-h-screen relative overflow-hidden" data-testid="team-section" style={{ perspective: '1200px' }}>
             <div className="max-w-7xl mx-auto px-4 text-center mb-8">
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Meet Our Team</h2>
+                <h2 
+                    className="text-4xl md:text-5xl font-bold text-primary mb-4"
+                    style={{ textShadow: '0 0 20px rgba(216, 32, 50, 0.5)' }}
+                >
+                    Meet Our Team
+                </h2>
                 <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                     The driving force behind our mission
                 </p>
             </div>
             
             <div className="relative w-full h-[65vh] md:h-[70vh] flex items-center justify-center">
-                {/* Previous Card */}
                 <motion.div
                     key={prevMemberIndex}
                     initial={{ scale: 0, x: '-50%', opacity: 0 }}
@@ -90,7 +92,6 @@ export default function TeamSection() {
                      </div>
                 </motion.div>
 
-                {/* Next Card */}
                 <motion.div
                     key={nextMemberIndex}
                     initial={{ scale: 0, x: '50%', opacity: 0 }}
@@ -104,7 +105,6 @@ export default function TeamSection() {
                      </div>
                 </motion.div>
 
-                {/* Center Card */}
                 <AnimatePresence initial={false} custom={direction}>
                     <motion.div
                         key={page}

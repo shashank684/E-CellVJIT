@@ -3,10 +3,13 @@ import {
   type InsertUser, 
   type ContactSubmission, 
   type InsertContactSubmission,
+  type Event,
+  type InsertEvent,
   users,
-  contactSubmissions 
+  contactSubmissions,
+  events 
 } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { db } from "./db";
 
 export interface IStorage {
@@ -15,7 +18,12 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
   getContactSubmissions(): Promise<ContactSubmission[]>;
-  deleteContactSubmission(id: string): Promise<{ success: boolean }>; // Added this line
+  deleteContactSubmission(id: string): Promise<{ success: boolean }>;
+  
+  // --- NEW: Event Methods Interface ---
+  createEvent(event: InsertEvent): Promise<Event>;
+  getEvents(): Promise<Event[]>;
+  deleteEvent(id: string): Promise<{ success: boolean }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -40,12 +48,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getContactSubmissions(): Promise<ContactSubmission[]> {
-    return await db.select().from(contactSubmissions).orderBy(contactSubmissions.createdAt);
+    return await db.select().from(contactSubmissions).orderBy(desc(contactSubmissions.createdAt));
   }
 
-  // Added this method
   async deleteContactSubmission(id: string): Promise<{ success: boolean }> {
     await db.delete(contactSubmissions).where(eq(contactSubmissions.id, id));
+    return { success: true };
+  }
+
+  // --- NEW: Event Method Implementations ---
+  async createEvent(event: InsertEvent): Promise<Event> {
+    const result = await db.insert(events).values(event).returning();
+    return result[0];
+  }
+
+  async getEvents(): Promise<Event[]> {
+    // Fetch events ordered by date, with the newest events appearing first.
+    return await db.select().from(events).orderBy(desc(events.date));
+  }
+
+  async deleteEvent(id: string): Promise<{ success: boolean }> {
+    await db.delete(events).where(eq(events.id, id));
     return { success: true };
   }
 }

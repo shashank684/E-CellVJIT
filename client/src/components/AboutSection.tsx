@@ -5,25 +5,7 @@ import { Card } from '@/components/ui/card';
 
 export default function AboutSection() {
   const [morphIndex, setMorphIndex] = useState(0);
-  const [typewriterText, setTypewriterText] = useState('');
   
-  const highlightText = 'Fostering innovation, one idea at a time.';
-  
-  // Typewriter effect
-  useEffect(() => {
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex <= highlightText.length) {
-        setTypewriterText(highlightText.slice(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Morphing polygon animation
   useEffect(() => {
     const interval = setInterval(() => {
       setMorphIndex((prev) => (prev + 1) % 4);
@@ -39,7 +21,6 @@ export default function AboutSection() {
     'polygon(35% 35%, 65% 25%, 85% 65%, 25% 75%)'
   ];
 
-  // Updated features array without "Startup Incubation"
   const features = [
     { icon: Lightbulb, title: 'Innovation Hub', description: 'A creative space where groundbreaking ideas are born and nurtured.' },
     { icon: Users, title: 'Community Building', description: 'Connecting entrepreneurs, mentors, and industry experts.' },
@@ -47,10 +28,9 @@ export default function AboutSection() {
   ];
 
   const cardVariants = {
-    hidden: { opacity: 0, rotateX: -90, y: 50 },
+    hidden: { opacity: 0, y: 50 },
     visible: (i: number) => ({
       opacity: 1,
-      rotateX: 0,
       y: 0,
       transition: {
         delay: i * 0.15,
@@ -70,7 +50,10 @@ export default function AboutSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 
+            className="text-4xl md:text-5xl font-bold text-primary mb-4"
+            style={{ textShadow: '0 0 20px rgba(216, 32, 50, 0.5)' }}
+          >
             About E-Cell VJIT
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
@@ -79,7 +62,6 @@ export default function AboutSection() {
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-24">
-          {/* Reverted to Morphing Visual */}
           <motion.div
             className="relative flex items-center justify-center h-96"
             initial={{ opacity: 0, x: -50 }}
@@ -107,26 +89,6 @@ export default function AboutSection() {
                   </motion.div>
                 </div>
               </motion.div>
-              
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-2 h-2 bg-primary rounded-full"
-                  style={{
-                    top: `${20 + Math.random() * 60}%`,
-                    left: `${20 + Math.random() * 60}%`,
-                  }}
-                  animate={{
-                    y: [-10, 10, -10],
-                    opacity: [0.3, 1, 0.3]
-                  }}
-                  transition={{
-                    duration: 2 + Math.random() * 2,
-                    repeat: Infinity,
-                    delay: Math.random() * 2
-                  }}
-                />
-              ))}
             </div>
           </motion.div>
 
@@ -147,28 +109,9 @@ export default function AboutSection() {
                 their innovative ideas into successful ventures.
               </p>
             </div>
-            <motion.div
-              className="border-l-4 border-primary pl-6 py-2"
-              initial={{ width: 0 }}
-              whileInView={{ width: '100%' }}
-              transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
-              viewport={{ once: true }}
-            >
-              <p className="text-xl font-medium text-primary">
-                {typewriterText}
-                <motion.span
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="ml-1"
-                >
-                  |
-                </motion.span>
-              </p>
-            </motion.div>
           </motion.div>
         </div>
 
-        {/* Updated grid to be responsive with 3 items */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <motion.div
@@ -178,9 +121,16 @@ export default function AboutSection() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.5 }}
               variants={cardVariants}
-              whileHover={{ y: -10, scale: 1.03, transition: { type: 'spring', stiffness: 300 } }}
+              whileHover={{ y: -8 }}
+              className="relative rounded-2xl"
             >
-              <Card className="bg-card/80 backdrop-blur-sm border-card-border hover:border-primary/50 transition-all duration-300 p-6 h-full text-center hover-elevate">
+              <motion.div 
+                className="absolute inset-0 bg-primary/20 blur-xl rounded-2xl"
+                whileHover={{ opacity: 1 }}
+                initial={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              />
+              <Card className="bg-card/80 backdrop-blur-sm border border-white/10 hover:border-primary/50 transition-colors duration-300 h-full text-center p-6 relative z-10">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-primary/20">
                   <feature.icon className="w-8 h-8 text-primary" />
                 </div>

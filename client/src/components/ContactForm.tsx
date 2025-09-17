@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Send, Mail, Phone, MapPin, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { Send, Mail, Phone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -93,14 +93,14 @@ export default function ContactForm() {
     {
         icon: Phone,
         label: 'Anushka',
-        value: '+91 1234567890',
-        href: 'tel:+911234567890'
+        value: '+91 7842749527',
+        href: 'tel:+917842749527'
     },
     {
       icon: MapPin,
       label: 'Address',
       value: 'VJIT Campus, Hyderabad, Telangana',
-      href: 'https://maps.app.goo.gl/3Zvaj3Ua8yXLFGUw9'
+      href: 'https://maps.google.com/?q=VJIT+Campus,Hyderabad,Telangana'
     }
   ];
 
@@ -114,7 +114,11 @@ export default function ContactForm() {
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4" data-testid="contact-title">
+          <h2 
+            className="text-4xl md:text-5xl font-bold text-primary mb-4" 
+            data-testid="contact-title"
+            style={{ textShadow: '0 0 20px rgba(216, 32, 50, 0.5)' }}
+          >
             Get In Touch
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto" data-testid="contact-description">
@@ -123,7 +127,6 @@ export default function ContactForm() {
         </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-12 items-start">
-          {/* Contact Information & Socials */}
           <motion.div
             className="lg:col-span-2 space-y-12"
             initial={{ opacity: 0, x: -30 }}
@@ -160,7 +163,6 @@ export default function ContactForm() {
             </div>
           </motion.div>
 
-          {/* Contact Form */}
           <motion.div
             className="lg:col-span-3"
             initial={{ opacity: 0, x: 30 }}
