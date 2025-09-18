@@ -1,24 +1,27 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSubmissionSchema, insertEventSchema } from "@shared/schema";
+import { insertContactSubmissionSchema, insertEventSchema, insertTeamMemberSchema } from "@shared/schema";
 import { randomBytes } from "crypto";
+import multer from 'multer';
 
-// This will store our tokens temporarily.
+// Set up multer for memory storage to handle file uploads.
+const upload = multer({ storage: multer.memoryStorage() });
+
+// This will store our active admin tokens temporarily.
 const activeTokens = new Set<string>();
 
-// Admin authentication middleware
+// Admin authentication middleware to protect sensitive routes.
 const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (token && activeTokens.has(token)) {
-    next();
-  } else {
-    res.status(401).json({ success: false, message: 'Authentication required' });
+    return next();
   }
+  res.status(401).json({ success: false, message: 'Authentication required' });
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // --- Admin authentication routes (Unchanged) ---
+  // --- Admin Authentication Routes ---
   app.post("/api/admin/login", async (req, res) => {
     try {
       const { password } = req.body;
@@ -50,7 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, isAuthenticated: true });
   });
 
-  // --- Protected admin routes for submissions (Unchanged) ---
+  // --- Contact Submission Routes ---
   app.get("/api/admin/submissions", requireAuth, async (req, res) => {
     try {
       const submissions = await storage.getContactSubmissions();
@@ -72,12 +75,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // --- Contact form submission endpoint (Unchanged) ---
   app.post("/api/contact", async (req, res) => {
     try {
       const validatedData = insertContactSubmissionSchema.parse(req.body);
       const submission = await storage.createContactSubmission(validatedData);
-      res.json({ 
+      res.status(201).json({ 
         success: true, 
         message: "Thank you for your message! We'll get back to you within 24 hours.",
         id: submission.id 
@@ -91,8 +93,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // --- NEW: Public Endpoint to Fetch All Events ---
-  app.get("/api/events", async (req, res) => {
+  // --- Event Routes ---
+  app.get("/api/events", async (_req, res) => {
     try {
       const allEvents = await storage.getEvents();
       res.json(allEvents);
@@ -102,7 +104,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // --- NEW: Protected Admin Endpoint to Create an Event ---
   app.post("/api/admin/events", requireAuth, async (req, res) => {
     try {
       const validatedData = insertEventSchema.parse(req.body);
@@ -114,7 +115,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // --- NEW: Protected Admin Endpoint to Delete an Event ---
   app.delete("/api/admin/events/:id", requireAuth, async (req, res) => {
     try {
       const { id } = req.params;
@@ -123,6 +123,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting event:', error);
       res.status(500).json({ success: false, message: 'Failed to delete event' });
+    }
+  });
+
+  // --- Team Member Routes ---
+  app.get("/api/team/featured", async (_req, res) => {
+    try {
+      const members = await storage.getFeaturedTeamMembers();
+      res.json(members);
+    } catch (error) {
+      console.error('Error fetching featured team:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch team members' });
+    }
+  });
+
+  app.get("/api/team", async (_req, res) => {
+    try {
+      const members = await storage.getTeamMembers({ admin: false });
+      res.json(members);
+    } catch (error) {
+      console.error('Error fetching team:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch team members' });
+    }
+  });
+  
+  app.get("/api/admin/team", requireAuth, async (_req, res) => {
+    try {
+      const members = await storage.getTeamMembers({ admin: true });
+      res.json(members);
+    } catch (error) {
+      console.error('Error fetching team for admin:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch team members' });
+    }
+  });
+
+  app.post("/api/admin/team", requireAuth, upload.single('photo'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: "A photo is required." });
+      }
+
+      const validatedData = insertTeamMemberSchema.omit({ imageUrl: true }).parse({
+        ...req.body,
+        isFeatured: req.body.isFeatured === 'true',
+        displayOrder: parseInt(req.body.displayOrder, 10),
+      });
+      
+      const newMember = await storage.createTeamMember(validatedData, req.file);
+      res.status(201).json({ success: true, message: "Team member added successfully.", member: newMember });
+    } catch (error) {
+      console.error('Error creating team member:', error);
+      res.status(400).json({ success: false, message: "Invalid data provided for team member." });
+    }
+  });
+
+  app.put("/api/admin/team/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const dataToUpdate = {
+        ...req.body,
+        ...(req.body.isFeatured !== undefined && { isFeatured: req.body.isFeatured === 'true' || req.body.isFeatured === true }),
+        ...(req.body.displayOrder !== undefined && { displayOrder: parseInt(req.body.displayOrder, 10) }),
+      };
+      const updatedMember = await storage.updateTeamMember(id, dataToUpdate);
+      res.json({ success: true, message: "Team member updated successfully.", member: updatedMember });
+    } catch (error) {
+      console.error('Error updating team member:', error);
+      res.status(500).json({ success: false, message: 'Failed to update team member' });
+    }
+  });
+  
+  app.delete("/api/admin/team/:id", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteTeamMember(id);
+      res.json({ success: true, message: "Team member deleted successfully." });
+    } catch (error) {
+      console.error('Error deleting team member:', error);
+      res.status(500).json({ success: false, message: 'Failed to delete team member' });
     }
   });
 

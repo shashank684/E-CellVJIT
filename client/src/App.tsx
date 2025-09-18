@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Switch, Route } from "wouter";
+import { Switch, Route, Link } from "wouter";
 import { motion } from 'framer-motion';
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -19,6 +19,7 @@ import { Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const Admin = lazy(() => import("@/pages/Admin"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const FullTeamPage = lazy(() => import("@/pages/FullTeamPage")); // <-- NEW: Import FullTeamPage
 
 function HomePage() {
   const [currentSection, setCurrentSection] = useState('home');
@@ -213,6 +214,7 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/admin" component={Admin} />
+      <Route path="/team" component={FullTeamPage} /> {/* <-- NEW: Route for full team page */}
       <Route component={NotFound} />
     </Switch>
   );

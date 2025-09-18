@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import type { Event } from '@shared/schema';
+import { useToast } from '@/hooks/use-toast';
 
 // Fetches event data from your new API endpoint
 const fetchEvents = async (): Promise<Event[]> => {
@@ -43,6 +44,7 @@ export default function EventsSection() {
     queryFn: fetchEvents,
   });
 
+  const { toast } = useToast();
   const [[page, direction], setPage] = useState([0, 0]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -71,14 +73,6 @@ export default function EventsSection() {
 
   const event = events[page];
   const isUpcoming = event.status === 'upcoming';
-
-  const handleButtonClick = () => {
-    if (isUpcoming && event.registrationLink) {
-      window.open(event.registrationLink, '_blank', 'noopener,noreferrer');
-    } else if (!isUpcoming) {
-      setSelectedEvent(event);
-    }
-  };
   
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -97,8 +91,8 @@ export default function EventsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold text-primary mb-4" // MODIFIED: text-white -> text-primary
-            style={{ textShadow: '0 0 20px rgba(216, 32, 50, 0.5)' }} // MODIFIED: Added glow
+            className="text-4xl md:text-5xl font-bold text-primary mb-4"
+            style={{ textShadow: '0 0 20px rgba(216, 32, 50, 0.5)' }}
           >
             Our Events
           </motion.h2>
@@ -140,27 +134,48 @@ export default function EventsSection() {
               className="w-[360px] md:w-[480px] h-[450px] absolute"
             >
               <div className={cn( "h-full w-full rounded-2xl p-6 md:p-8 flex flex-col justify-between transition-all duration-300", "glass-card border-t-4", isUpcoming ? 'border-primary' : 'border-gray-600' )}>
-                <div>
-                  <div className="flex justify-between items-start mb-4">
-                    <Badge variant={isUpcoming ? 'default' : 'secondary'} className={`border-none ${isUpcoming ? 'bg-primary/20 text-primary' : 'bg-gray-700/50 text-gray-300'}`}>
-                      {isUpcoming ? 'Upcoming' : 'Completed'}
-                    </Badge>
-                    <div className="flex items-center text-gray-400 text-sm font-mono">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {formatDate(event.date)}
+                {/* Content area */}
+                <div className="flex-grow flex flex-col overflow-hidden">
+                  <div className="flex-shrink-0">
+                    <div className="flex justify-between items-start mb-4">
+                      <Badge variant={isUpcoming ? 'default' : 'secondary'} className={`border-none ${isUpcoming ? 'bg-primary/20 text-primary' : 'bg-gray-700/50 text-gray-300'}`}>
+                        {isUpcoming ? 'Upcoming' : 'Completed'}
+                      </Badge>
+                      <div className="flex items-center text-gray-400 text-sm font-mono flex-shrink-0">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        {formatDate(event.date)}
+                      </div>
                     </div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-primary mb-3">{event.title}</h3>
                   </div>
-                  {/* --- MODIFIED: Changed text color --- */}
-                  <h3 className="text-2xl md:text-3xl font-bold text-primary mb-3">{event.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{event.description}</p>
+                  {/* Description with line-clamp */}
+                  <div className="flex-grow overflow-hidden">
+                    <p className="text-gray-300 leading-relaxed line-clamp-5">{event.description}</p>
+                  </div>
                 </div>
-                <div className="flex justify-end">
+                {/* Button container */}
+                <div className="flex justify-end pt-4 flex-shrink-0 gap-4">
+                  {isUpcoming && (
+                     <Button 
+                        className="group bg-primary hover:bg-primary/90"
+                        onClick={() => {
+                          if (event.registrationLink) {
+                            window.open(event.registrationLink, '_blank', 'noopener,noreferrer');
+                          } else {
+                             toast({ title: "Registration not yet open."});
+                          }
+                        }}
+                      >
+                        Register Now
+                        <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                      </Button>
+                  )}
                   <Button 
-                    className={`group ${isUpcoming ? 'bg-primary hover:bg-primary/90' : 'bg-gray-600/50 hover:bg-gray-600'}`}
-                    onClick={handleButtonClick}
+                    variant="outline"
+                    className="group border-gray-600 hover:border-primary hover:bg-primary/10 hover:text-primary"
+                    onClick={() => setSelectedEvent(event)}
                   >
-                    {isUpcoming ? 'Register Now' : 'Know More'}
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                    Know More
                   </Button>
                 </div>
               </div>
@@ -182,8 +197,8 @@ export default function EventsSection() {
             </div>
           </DialogHeader>
           <div className="max-h-[60vh] overflow-y-auto pr-4 mt-4">
-            <DialogDescription className="text-gray-300 text-base leading-relaxed">
-              {selectedEvent?.summary}
+            <DialogDescription className="text-gray-300 text-base leading-relaxed whitespace-pre-wrap">
+              {selectedEvent?.summary || "More details coming soon."}
             </DialogDescription>
           </div>
         </DialogContent>
@@ -191,3 +206,4 @@ export default function EventsSection() {
     </>
   );
 }
+

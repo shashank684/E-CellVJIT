@@ -1,33 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Instagram, Linkedin } from 'lucide-react';
+import { Instagram, Linkedin, Users } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'wouter';
+import { Button } from '@/components/ui/button';
+import type { TeamMember } from '@shared/schema';
 
-// Using the correct asset paths for all team members
-import profileImage1 from '@assets/generated_images/shashank.svg';
-import profileImage2 from '@assets/generated_images/anushka.svg'; // Corrected path for Anushka
-import profileImage3 from '@assets/generated_images/pavan.svg'; // Corrected path for Pavan
-import profileImage4 from '@assets/generated_images/sairam.svg';
-import profileImage5 from '@assets/generated_images/sujith.svg';
-import profileImage6 from '@assets/generated_images/rithika.svg';
-import profileImage7 from '@assets/generated_images/sankeerth.svg';
+// Fetches featured team members
+const fetchFeaturedTeamMembers = async (): Promise<TeamMember[]> => {
+  const response = await fetch('/api/team/featured');
+  if (!response.ok) {
+    throw new Error('Failed to fetch team members');
+  }
+  return response.json();
+};
 
-interface TeamMember {
-  name: string;
-  role: string;
-  img: string;
-  instagram?: string;
-  linkedin?: string;
-}
-
-const teamMembers: TeamMember[] = [
-    { name: "Shashank Shilapally", role: "President", img: profileImage1, instagram: "https://www.instagram.com/shashank_6804/?utm_source=ig_web_button_share_sheet", linkedin: "https://www.linkedin.com/in/shashank-shilapally-" },
-    { name: "Anushka Sahoo", role: "Associate President", img: profileImage2, instagram: "https://www.instagram.com/_galaxygroove/?utm_source=ig_web_button_share_sheet", linkedin: "https://linkedin.com/in/priya-sharma-ecell" },
-    { name: "Pavan kumar", role: "Creative and Design Lead", img: profileImage3, instagram: "https://www.instagram.com/pavan_k.t/?utm_source=ig_web_button_share_sheet", linkedin: "https://linkedin.com/in/arjun-kumar-ecell" },
-    { name: "M. Sairam", role: "Marketing and PR Lead", img: profileImage4, instagram: "https://www.instagram.com/__sai_0818?utm_source=ig_web_button_share_sheet&igsh=cHc1am82bXliaDFn", linkedin: "https://linkedin.com/in/sneha-reddy-ecell" },
-    { name: "Sujith", role: "Social Media Lead", img: profileImage5, instagram: "https://www.instagram.com/sujzzzt?utm_source=ig_web_button_share_sheet&igsh=MWpvdmIyaWc3OTlkdg==", linkedin: "https://linkedin.com/in/rahul-gupta-ecell" },
-    { name: "Rithika", role: "Documentation Lead", img: profileImage6, instagram: "https://www.instagram.com/rithikasunkari?utm_source=ig_web_button_share_sheet&igsh=MXZicnFlZDZ3NmlzNw==", linkedin: "https://linkedin.com/in/kavya-nair-ecell" },
-    { name: "Sankeerth", role: "Event Management Lead", img: profileImage7, instagram: "https://www.instagram.com/sankeerth__chowdary/?utm_source=ig_web_button_share_sheet", linkedin: "https://linkedin.com/in/vikram-singh-ecell" }
-];
 
 const variants = {
   enter: (direction: number) => ({
@@ -50,7 +37,31 @@ const variants = {
 };
 
 export default function TeamSection() {
+    const { data: teamMembers, isLoading, error } = useQuery<TeamMember[]>({
+      queryKey: ['featuredTeamMembers'],
+      queryFn: fetchFeaturedTeamMembers,
+    });
+
     const [[page, direction], setPage] = useState([0, 0]);
+
+    if (isLoading) {
+        return (
+          <section className="py-16 md:py-24 h-[600px] flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </section>
+        );
+    }
+
+    if (error || !teamMembers || teamMembers.length === 0) {
+        return (
+          <section className="py-16 md:py-24 text-center">
+            <div className="max-w-7xl mx-auto px-4">
+                <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4" style={{ textShadow: '0 0 20px rgba(216, 32, 50, 0.5)' }}>Meet Our Team</h2>
+                <p className="text-xl text-gray-400">Team members are not available at the moment. Please check back soon!</p>
+            </div>
+          </section>
+        );
+    }
 
     const paginate = (newDirection: number) => {
         setPage([(page + newDirection + teamMembers.length) % teamMembers.length, newDirection]);
@@ -88,7 +99,7 @@ export default function TeamSection() {
                     style={{ transformOrigin: 'center right', zIndex: 0 }}
                 >
                      <div className="w-full h-full glass-card rounded-3xl overflow-hidden relative shadow-lg">
-                        <img src={prevMember.img} alt={prevMember.name} className="w-full h-full object-cover" />
+                        <img src={prevMember.imageUrl} alt={prevMember.name} className="w-full h-full object-cover" />
                      </div>
                 </motion.div>
 
@@ -101,7 +112,7 @@ export default function TeamSection() {
                     style={{ transformOrigin: 'center left', zIndex: 0 }}
                 >
                      <div className="w-full h-full glass-card rounded-3xl overflow-hidden relative shadow-lg">
-                        <img src={nextMember.img} alt={nextMember.name} className="w-full h-full object-cover" />
+                        <img src={nextMember.imageUrl} alt={nextMember.name} className="w-full h-full object-cover" />
                      </div>
                 </motion.div>
 
@@ -120,7 +131,7 @@ export default function TeamSection() {
                         drag="x"
                         dragConstraints={{ left: 0, right: 0 }}
                         dragElastic={0.5}
-                        onDragEnd={(e, { offset, velocity }) => {
+                        onDragEnd={(_, { offset, velocity }) => {
                             const swipeThreshold = 50;
                             const swipePower = Math.abs(offset.x) * velocity.x;
                             if (swipePower < -swipeThreshold) paginate(1);
@@ -129,7 +140,7 @@ export default function TeamSection() {
                         className="w-[70vw] md:w-[380px] h-[90vw] md:h-[520px] absolute cursor-grab active:cursor-grabbing"
                     >
                         <div className="w-full h-full glass-card rounded-3xl overflow-hidden relative shadow-2xl shadow-primary/20">
-                            <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
+                            <img src={member.imageUrl} alt={member.name} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 flex flex-col justify-end">
                                 <h3 className="text-3xl font-bold text-white">{member.name}</h3>
                                 <p className="text-xl text-primary">{member.role}</p>
@@ -152,6 +163,15 @@ export default function TeamSection() {
             </div>
              <div className="mt-8 text-gray-500 font-mono text-sm">
                 ‹ drag or swipe ›
+             </div>
+             {/* NEW: Button to navigate to the full team page */}
+             <div className="mt-8">
+                 <Link href="/team">
+                    <Button variant="outline" className="border-2 border-primary/50 text-white rounded-full bg-black/20 backdrop-blur-sm hover:bg-primary/20 hover:border-primary transition-all duration-300 px-8 py-3 text-lg font-semibold">
+                        <Users className="w-5 h-5 mr-2" />
+                        View Full Team
+                    </Button>
+                 </Link>
              </div>
         </section>
     );

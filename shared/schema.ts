@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, json, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -23,16 +23,28 @@ export const sessions = pgTable("sessions", {
   expire: timestamp("expire", { mode: "date" }).notNull(),
 });
 
-// --- NEW: Events Table Definition ---
 export const events = pgTable("events", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   date: timestamp("date", { mode: "date" }).notNull(),
-  description: text("description").notNull(), // Short description for the card
+  description: text("description").notNull(), 
   status: text("status", { enum: ["upcoming", "past"] }).notNull(),
-  registrationLink: text("registration_link"), // For upcoming events
-  summary: text("summary"), // Detailed description for past event pop-ups
-  image: text("image").default('/assets/events/default.jpg'), // Default image path
+  registrationLink: text("registration_link"), 
+  summary: text("summary"),
+  image: text("image").default('/assets/events/default.jpg'),
+});
+
+// --- NEW: Team Members Table Definition ---
+export const teamMembers = pgTable("team_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  role: text("role").notNull(),
+  imageUrl: text("image_url").notNull(),
+  instagram: text("instagram"),
+  linkedin: text("linkedin"),
+  isFeatured: boolean("is_featured").default(false).notNull(),
+  displayOrder: integer("display_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -46,9 +58,7 @@ export const insertContactSubmissionSchema = createInsertSchema(contactSubmissio
   message: true,
 });
 
-// --- NEW: Zod Schema for Event Insertion/Validation ---
 export const insertEventSchema = createInsertSchema(events, {
-  // Allow date to be provided as a string from the form
   date: z.string().transform((str) => new Date(str)),
 }).pick({
   title: true,
@@ -60,12 +70,25 @@ export const insertEventSchema = createInsertSchema(events, {
   image: true,
 });
 
+// --- NEW: Zod Schema for Team Member Insertion/Validation ---
+export const insertTeamMemberSchema = createInsertSchema(teamMembers).pick({
+  name: true,
+  role: true,
+  imageUrl: true,
+  instagram: true,
+  linkedin: true,
+  isFeatured: true,
+  displayOrder: true,
+});
+
 // --- Type Exports ---
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
-
-// --- NEW: Type Exports for Events ---
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
+
+// --- NEW: Type Exports for Team Members ---
+export type TeamMember = typeof teamMembers.$inferSelect;
+export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
